@@ -16,6 +16,7 @@ export default {
     });
 
     return {
+      status: 200,
       body: {
         status: "Task received",
         message

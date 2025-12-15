@@ -7,9 +7,9 @@ export default {
   },
 
   handler: async (event, { emit }) => {
-    const message = event.data?.message;
+    const message = event.message;
 
-    console.log("✅ ValidateTask received message:", message);
+    console.log("✅ Validate Task received message:", message);
 
     // ❗ NO throw, NO validation for now
     await emit({

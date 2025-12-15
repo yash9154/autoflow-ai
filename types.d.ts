@@ -12,8 +12,12 @@ declare module 'motia' {
   }
 
   interface Handlers {
-    'ValidateTask': EventHandler<never, never>
+    'ValidateTask': EventHandler<never, { topic: 'task.validated'; data: never }>
+    'UrgentTaskHandler': EventHandler<never, { topic: 'task.completed'; data: never }>
     'ReceiveTask': ApiRouteHandler<Record<string, unknown>, unknown, { topic: 'task.received'; data: never }>
+    'NormalTaskHandler': EventHandler<never, { topic: 'task.completed'; data: never }>
+    'CompletionLogger': EventHandler<never, never>
+    'AIDecision': EventHandler<never, { topic: 'task.urgent'; data: never } | { topic: 'task.normal'; data: never }>
   }
     
 }
