@@ -1,83 +1,173 @@
-# autoflow-ai
+# AutoFlow AI 🚀
 
-A Motia project created with the starter template.
+> AI-Powered Task Prioritization using Motia Workflows
 
-## What is Motia?
+**Hackathon**: MotiaHack25 by WeMakeDevs
 
-Motia is an open-source, unified backend framework that eliminates runtime fragmentation by bringing **APIs, background jobs, queueing, streaming, state, workflows, AI agents, observability, scaling, and deployment** into one unified system using a single core primitive, the **Step**.
+---
+
+## Problem
+
+Organizations receive tasks from multiple sources. Without proper prioritization:
+- Urgent issues get delayed
+- Resources are misallocated
+- Response times suffer
+
+## Solution
+
+AutoFlow AI uses **LLM-powered intelligence** to automatically classify and route tasks based on urgency. Built on **Motia's event-driven workflow architecture**, it demonstrates:
+
+- 🤖 **AI Agent as a Workflow Step**
+- 📡 **Event-Driven Architecture**
+- ⏰ **Scheduled System Audits**
+- 🎯 **Explainable AI Decisions**
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                          AutoFlow AI                                │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────────┐    ┌──────────────┐    ┌───────────────────┐      │
+│  │  POST /task │───▶│ ReceiveTask  │───▶│  ValidateTask     │      │
+│  └─────────────┘    └──────────────┘    └───────────────────┘      │
+│                            │                      │                 │
+│                     task.received          task.validated          │
+│                                                   │                 │
+│                                                   ▼                 │
+│                                      ┌────────────────────────┐    │
+│                                      │   🤖 AIAgentDecision   │    │
+│                                      │   (Gemini LLM)         │    │
+│                                      └────────────────────────┘    │
+│                                         │              │           │
+│                                  task.urgent      task.normal      │
+│                                         │              │           │
+│                                         ▼              ▼           │
+│                              ┌──────────────┐ ┌──────────────┐    │
+│                              │UrgentHandler │ │NormalHandler │    │
+│                              └──────────────┘ └──────────────┘    │
+│                                         │              │           │
+│                                         └──────┬───────┘           │
+│                                          task.completed            │
+│                                                │                   │
+│                                                ▼                   │
+│                                      ┌──────────────────┐          │
+│                                      │CompletionLogger  │          │
+│                                      └──────────────────┘          │
+│                                                                     │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                    Scheduled Flow                             │  │
+│  │  ┌────────────────┐    ┌─────────────────┐    ┌───────────┐  │  │
+│  │  │ SystemAudit    │───▶│ SystemAudit     │───▶│  Audit    │  │  │
+│  │  │ Scheduler      │    │ Handler         │    │  Logger   │  │  │
+│  │  │ (*/2 * * * *)  │    └─────────────────┘    └───────────┘  │  │
+│  │  └────────────────┘                                           │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## AI Decision Output
+
+```json
+{
+  "decision": "urgent",
+  "priority": "high",
+  "reason": "Production database outage requires immediate attention",
+  "confidence": "high",
+  "keywords_detected": ["down", "production", "database"]
+}
+```
+
+---
 
 ## Quick Start
 
-```bash
-# Start the development server
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-This starts the Motia runtime and the **Workbench** - a powerful UI for developing and debugging your workflows. By default, it's available at [`http://localhost:3000`](http://localhost:3000).
+### 1. Clone & Install
 
 ```bash
-# Test your first endpoint
-curl http://localhost:3000/hello
+git clone <repo>
+cd autoflow-ai
+npm install --legacy-peer-deps
 ```
 
-## Step Types
-
-Every Step has a `type` that defines how it triggers:
-
-| Type | When it runs | Use case |
-|------|--------------|----------|
-| **`api`** | HTTP request | REST APIs, webhooks |
-| **`event`** | Event emitted | Background jobs, workflows |
-| **`cron`** | Schedule | Cleanup, reports, reminders |
-
-## Development Commands
+### 2. Configure Environment
 
 ```bash
-# Start Workbench and development server
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-
-# Start production server (without hot reload)
-npm run start
-# or
-yarn start
-# or
-pnpm start
-
-# Generate TypeScript types from Step configs
-npm run generate-types
-# or
-yarn generate-types
-# or
-pnpm generate-types
-
-# Build project for deployment
-npm run build
-# or
-yarn build
-# or
-pnpm build
+# Create .env file
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
-## Project Structure
+Get your API key: https://aistudio.google.com/apikey
 
+### 3. Run
+
+```bash
+npx motia dev
 ```
-steps/              # Your Step definitions (or use src/)
-motia.config.ts     # Motia configuration
+
+### 4. Access
+
+- **Demo UI**: http://localhost:3000
+- **API**: POST http://localhost:3000/task
+- **Workbench**: Check console for URL
+
+---
+
+## Test Commands
+
+```bash
+# Urgent task (AI detects urgency)
+curl -X POST http://localhost:3000/task \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Production server is down!"}'
+
+# Normal task
+curl -X POST http://localhost:3000/task \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Please review the quarterly report"}'
 ```
 
-Steps are auto-discovered from your `steps/` or `src/` directories - no manual registration required.
+---
 
-## Learn More
+## Steps Overview
 
-- [Documentation](https://motia.dev/docs) - Complete guides and API reference
-- [Quick Start Guide](https://motia.dev/docs/getting-started/quick-start) - Detailed getting started tutorial
-- [Core Concepts](https://motia.dev/docs/concepts/overview) - Learn about Steps and Motia architecture
-- [Discord Community](https://discord.gg/motia) - Get help and connect with other developers
+| Step | Type | Description |
+|------|------|-------------|
+| ReceiveTask | API | Entry point (POST /task) |
+| ValidateTask | Event | Validates task messages |
+| AIAgentDecision | Event | LLM-powered priority classification |
+| UrgentTaskHandler | Event | Handles high-priority tasks |
+| NormalTaskHandler | Event | Handles standard tasks |
+| CompletionLogger | Event | Logs final workflow result |
+| SystemAuditScheduler | Cron | Scheduled system monitoring |
+| SystemAuditHandler | Event | Processes audit events |
+
+---
+
+## Why Motia?
+
+1. **Event-Driven**: Clean separation of concerns
+2. **Unified Flows**: APIs, events, and schedules in one framework
+3. **Observability**: Built-in workbench for visualization
+4. **AI-Native**: LLMs as first-class workflow steps
+
+---
+
+## Tech Stack
+
+- **Runtime**: Node.js (ES Modules)
+- **Framework**: Motia
+- **AI**: Google Gemini API
+- **UI**: Vanilla HTML/CSS/JS
+
+---
+
+## License
+
+MIT

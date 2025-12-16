@@ -2,8 +2,10 @@ export default {
     config: {
         name: "CompletionLogger",
         type: "event",
+        description: "Logs final workflow completion with AI decision details",
         subscribes: ["task.completed"],
-        emits: []
+        emits: [],
+        flows: ["task-prioritization"]
     },
 
     handler: async (event) => {
