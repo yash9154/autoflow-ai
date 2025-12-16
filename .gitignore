@@ -6,3 +6,8 @@ venv
 .mermaid
 dist
 *.pyc
+
+# Environment variables (API keys)
+.env
+.env.local
+.env.*.local
