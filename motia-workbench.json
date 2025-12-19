@@ -12,5 +12,30 @@
         "sourceHandlePosition": "right"
       }
     }
+  },
+  {
+    "id": "task-prioritization",
+    "config": {
+      "steps\\validate-task.step.js": {
+        "x": 593,
+        "y": 339
+      },
+      "steps\\urgent-task-handler.step.js": {
+        "x": -27,
+        "y": 0
+      },
+      "steps\\receive-task.step.js": {
+        "x": -22,
+        "y": 282
+      },
+      "steps\\normal-task-handler.step.js": {
+        "x": -18,
+        "y": 153
+      },
+      "steps\\completion-logger.step.js": {
+        "x": 578,
+        "y": 51
+      }
+    }
   }
 ]

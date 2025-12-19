@@ -21,8 +21,12 @@
     "@motiadev/plugin-logs": "^0.17.6-beta.187",
     "@motiadev/plugin-observability": "^0.17.6-beta.187",
     "@motiadev/plugin-states": "^0.17.6-beta.187",
+    "@motiadev/stream-client-react": "^0.17.8-beta.190",
+    "@motiadev/ui": "^0.17.8-beta.190",
     "dotenv": "^16.4.7",
     "openai": "^4.77.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "zod": "^4.2.0"
   }
 }
