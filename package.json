@@ -14,12 +14,15 @@
     "motia"
   ],
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@motiadev/core": "^0.17.6-beta.187",
     "@motiadev/plugin-bullmq": "^0.17.6-beta.187",
     "@motiadev/plugin-endpoint": "^0.17.6-beta.187",
     "@motiadev/plugin-logs": "^0.17.6-beta.187",
     "@motiadev/plugin-observability": "^0.17.6-beta.187",
     "@motiadev/plugin-states": "^0.17.6-beta.187",
+    "dotenv": "^16.4.7",
+    "openai": "^4.77.0",
     "zod": "^4.2.0"
   }
 }
