@@ -25,8 +25,8 @@
         "y": 0
       },
       "steps\\receive-task.step.js": {
-        "x": -22,
-        "y": 282
+        "x": -94,
+        "y": 326
       },
       "steps\\normal-task-handler.step.js": {
         "x": -18,

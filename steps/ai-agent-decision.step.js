@@ -4,6 +4,53 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 // Initialize Gemini client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
+/**
+ * Clean and parse JSON response from Gemini
+ * Handles common issues like:
+ * - Text before/after JSON (e.g., "Here is the JSON: {...}")
+ * - Markdown code blocks
+ * - Trailing commas
+ * - Newlines in strings
+ * - Unquoted property names
+ */
+function parseGeminiJSON(text) {
+    let cleaned = text.trim();
+
+    // FIRST: Try to extract just the JSON object from any surrounding text
+    // This handles cases like "Here is the JSON response: { ... }"
+    const jsonObjectMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (jsonObjectMatch) {
+        cleaned = jsonObjectMatch[0];
+    } else {
+        // If no JSON object found, try removing code blocks first
+        if (cleaned.includes("```")) {
+            cleaned = cleaned.replace(/```(?:json)?\s*/g, "").replace(/```/g, "");
+            const retryMatch = cleaned.match(/\{[\s\S]*\}/);
+            if (retryMatch) {
+                cleaned = retryMatch[0];
+            }
+        }
+    }
+
+    cleaned = cleaned.trim();
+
+    // Fix trailing commas in arrays and objects (common LLM issue)
+    cleaned = cleaned.replace(/,\s*([}\]])/g, "$1");
+
+    // Fix unquoted property names
+    cleaned = cleaned.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":');
+
+    // Fix newlines inside string values (causes "Unterminated string" errors)
+    // This iteratively fixes newlines within quoted strings
+    let prevCleaned;
+    do {
+        prevCleaned = cleaned;
+        cleaned = cleaned.replace(/"([^"\n]*)\n([^"]*)"/g, '"$1 $2"');
+    } while (cleaned !== prevCleaned);
+
+    return JSON.parse(cleaned);
+}
+
 const SYSTEM_PROMPT = `You are a task priority classifier for an enterprise workflow system.
 
 Your job is to analyze incoming task messages and determine their priority level.
@@ -54,11 +101,27 @@ export default {
             const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
             console.log(`   Using model: ${modelName}`);
 
+            // Define the expected response schema
+            const responseSchema = {
+                type: "object",
+                properties: {
+                    decision: { type: "string", enum: ["urgent", "normal"] },
+                    priority: { type: "string", enum: ["high", "normal"] },
+                    reason: { type: "string" },
+                    confidence: { type: "string", enum: ["high", "medium", "low"] },
+                    keywords_detected: { type: "array", items: { type: "string" } }
+                },
+                required: ["decision", "priority", "reason", "confidence", "keywords_detected"]
+            };
+
             const model = genAI.getGenerativeModel({
                 model: modelName,
                 generationConfig: {
                     temperature: 0,
                     maxOutputTokens: 256,
+                    // Force JSON output mode with schema - guarantees valid JSON from Gemini
+                    responseMimeType: "application/json",
+                    responseSchema: responseSchema,
                 }
             });
 
@@ -68,8 +131,11 @@ export default {
             const response = await result.response;
             const text = response.text().trim();
 
-            // Parse JSON response
-            aiResult = JSON.parse(text);
+            // Debug: log raw response (first 200 chars) to help diagnose issues
+            console.log(`   📦 Raw response: ${text.substring(0, 200)}${text.length > 200 ? '...' : ''}`);
+
+            // Parse JSON response (with cleaning for common LLM output issues)
+            aiResult = parseGeminiJSON(text);
 
             console.log(`   🧠 AI Decision: ${aiResult.decision.toUpperCase()}`);
             console.log(`   📝 Reason: ${aiResult.reason}`);
